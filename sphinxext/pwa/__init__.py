@@ -26,7 +26,11 @@ def get_manifest(config: Dict[str, Any]) -> Dict[str, str]:
 
     icons = []
 
-    for path, sizes in config["pwa_icons"]:
+    for icon in config["pwa_icons"]:
+        if isinstance(icon, list ) : 
+            path, sizes = item
+        else :
+            item
         mime_type = mimetypes.guess_type(path)[0]
         if mime_type is None:
             raise ConfigError("Specified image is unrecognized type: " + path)
@@ -41,7 +45,7 @@ def get_manifest(config: Dict[str, Any]) -> Dict[str, str]:
         "background_color": config["pwa_background_color"],
         "display": config["pwa_display"],
         "scope": "../",
-        "start_url": f"../{config['root_doc']}.html?pwa",
+        "start_url": config.get('pwa_start_url', f"../{config['root_doc']}.html?pwa"),
         "icons": icons,
     }
 
@@ -176,6 +180,7 @@ def setup(app: Sphinx) -> Dict[str, Any]:
     app.add_config_value("pwa_exclude_cache", [], "html")
     app.add_config_value("pwa_apple_icon", "", "html")
     app.add_config_value("pwa_online_only", False, "html")
+    app.add_config_value("pwa_start_url", False, "html")
 
     app.connect("html-page-context", html_page_context)
     app.connect("build-finished", build_finished)
